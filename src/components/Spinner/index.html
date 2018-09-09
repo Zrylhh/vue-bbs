@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <script type="text/javascript" src="/dianshiv/tv/vt/js/vue.js"></script>
+    <title>components</title>
+  </head>
+  <body>
+    <div id="app">
+<!--     	<spinner></spinner> -->
+		<parent-com></parent-com>
+    </div>
+    
+    <!-- built files will be auto injected -->
+    
+<!--     <div class="vue-simple-spinner" style="margin: 0px auto;border-radius: 100%;border-width: 3px;border-style: solid;border-color: rgb(33, 150, 243) rgb(238, 238, 238) rgb(238, 238, 238);border-image: initial;width: 32px;height: 32px;animation: vue-simple-spinner-spin 0.8s linear 0s infinite normal none running;"></div> -->
+  </body>
+  
+<script type="text/javascript" id="template">
+
+</script>
+
+<script type="text/javascript" >
+	var isNumber = function(n){
+		return !isNaN(parseFloat(n) && isFinite(n));
+	}
+
+	Vue.component('spinner', {
+		props:{
+		      'size':{
+		        default:32
+		      },
+		      'line-size':{
+		        type:Number,
+		        default:3
+		      },
+		      'line-bg-color':{
+		        type:String,
+		        default:'#eee'
+		      },
+		      'line-fg-color':{
+		        type:String,
+		        default:'#2196f3'
+		      },
+		      'speed':{
+		        type:Number,
+		        default:0.8
+		      },
+		      'spacing':{
+		        type:Number,
+		        default:4
+		      },
+		      'message':{
+		        type:String,
+		        default:''
+		      },
+		      'font-size':{
+		        type:Number,
+		        default:13
+		      },
+		      'text-fg-color':{
+		        type:String,
+		        default: '#555'
+		      }
+		    },
+	  data: function () {
+	    return {
+	    }
+	  },
+	  template: `<div><div class="vue-simple-spinner" :style="spinner_style"></div><div class="vue-simple-spinner-text" :style="text_style" v-if="message.length > 0">{{message}}</div></div>`,
+	  computed:{
+		  size_px(){
+		        switch(this.size){
+		          case 'tiny':    return 12;
+		          case 'small' :  return 16;
+		          case 'medium' : return 32;
+		          case 'large' :  return 48;
+		          case 'big':     return 64;
+		          case 'huge':    return 96;
+		          case 'massive': return 128;
+		        }
+		        return isNumber(this.size) ? this.size :32;
+		      },
+		      line_size_px(){
+		        switch(this.size){
+		          case 'tiny':    return 1;
+		          case 'small' :  return 2;
+		          case 'medium' : return 3;
+		          case 'large' :  return 3;
+		          case 'big':     return 4;
+		          case 'huge':    return 4;
+		          case 'massive': return 5;
+		        }
+		        return isNumber(this.lineSize) ? this.lineSize :4;
+		      },
+		      text_margin_top(){
+		        switch(this.size){
+		          case 'tiny':    ;
+		          case 'small' :  ;
+		          case 'medium' : ;
+		          case 'large' :  ;
+		          case 'big':     ;
+		          case 'huge':    ;
+		          case 'massive': ;
+		          return Math.min(Math.max(Math.ceil(this.size_px/8), 3), 12);
+		        }
+		        return isNumber(this.spacing) ? this.spacing : 4;
+		      },
+		      text_font_size(){
+		        switch (this.size)
+		        {
+		          case 'tiny':
+		          case 'small':
+		          case 'medium':
+		          case 'large':
+		          case 'big':
+		          case 'huge':
+		          case 'massive':
+		            return Math.min(Math.max(Math.ceil(this.size_px*0.4), 11), 32);
+		        }
+		        return isNumber(this.fontSize) ? this.fontSize : 13;
+		      },
+		  spinner_style(){
+			return {
+			    'margin':'0 auto',
+			    'border-radius':'100%',
+			    'border':this.line_size_px+'px solid '+this.lineBgColor,
+			    'border-top': this.line_size_px+'px solid '+this.lineFgColor,
+			    'width': this.size_px+'px',
+			    'height':this.size_px+'px',
+			    'animation':'vue-simple-spinner-spin '+this.speed+'s linear infinite'
+			  }
+			},
+			text_style(){
+			  return {
+			    'margin-top':this.text_margin_top+'px',
+			    'color':this.textFgColor,
+			    'font-size':this.text_font_size+'px',
+			    'text-align':'center'
+			  }
+			}
+	  }
+	})
+	
+	
+	//子组件
+    //代表性的列表组件模块
+    Vue.component('child-com',{
+        template:'<a v-bind:href="url" class="nav-link" > <slot></slot> </a>',
+        data:function(){
+            return {
+                animal:[
+                    {name:'大象'},
+                    {name:'小狗'},
+                    {name:'小猫'},
+                    {name:'老虎'}
+                ],
+                url:"www.baidu.com"
+            }
+        }
+    });
+    //父组件
+    // 在父组件的模板里，使用一个Vue自带的特殊组件<template> ，
+    // 并在该组件上使用scope属性，值是一个临时的变量，存着的是由子组件传过来的
+    // prop对象，在下面的例子中我把他命名为props。
+    //  获得由子传过来的prop对象。这时候，父组件就可以访问子组件在自定义属性上暴露的数据了。
+    Vue.component('parent-com',{
+        template:'' +
+        '<div class="container">' +
+        '<p>动物列表</p>' +
+        '<child-com>' +
+        '   <template slot-scope="props" slot="child-ul">' +
+        '       <li class="child-ul">{{ props.text }}</li>' +
+        '   </template>' +
+        '</child-com>' +
+        '</div>'
+    });
+    
+
+	new Vue({ el: '#app' });
+	
+</script>
+  
+<style>
+  .vue-simple-spinner{
+    transition: all .3s linear;
+  }
+
+  @keyframes vue-simple-spinner-spin{
+    0%{transform:rotate(0deg);}
+    100{transform:rotate(360deg);}
+  }
+</style>
+</html>
