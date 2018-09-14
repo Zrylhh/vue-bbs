@@ -1,8 +1,15 @@
 <template>
 	<div class="page-index">
-		<span v-for='(page,index) in getRenderPages' v-bind:class="{ now: checkNowPage(page) }">
+		<span @click.prevent.stop="go(1)">&lt;&lt;</span>
+		<span>···</span>
+		<span v-for='(page,index) in getRenderPages' 
+			:class="{ now: checkNowPage(page) }"
+			@click.prevent.stop="go(parseInt(page))"
+			>
 			{{page}}
 		</span>
+		<span>···</span>
+		<span @click.prevent.stop="go('next')">&gt;</span>
 	</div>
 </template>
 
@@ -12,17 +19,20 @@
 import { mapState,mapGetters, mapMutations, mapActions } from 'vuex'
 
 export default {
+	name:'app-page',
+	props :{
+		nowpage : {
+            type : Number,
+            default : 1
+        },
+	},
 	data(){
 		return {
-			nowpage:1
 		}
 	},
 	computed:{
-		...mapGetters([
-	      'getPage'
-	      // ...
-	    ]),
 		getRenderPages : function(){
+			console.log("page ______getRenderPages");
 			var pageArr = [];
 			if(this.nowpage<=3){
 				pageArr.push(1);
@@ -39,16 +49,24 @@ export default {
 			}
 			
 			return pageArr;
-		},
-		checkNowPage : function(page){
-			return page==this.nowpage;
 		}
 	},
 	created:function(){
-		this.nowpage = this.getPage();
+		console.log("page_____ nowpage:"+this.nowpage);
 	},
 	methods: {
-	
+		checkNowPage : function(page){
+			return page==this.nowpage;
+		},
+		go:function(page){
+            //父组件通过change方法来接受当前的页码
+            if(page==='next'){
+            	page = this.nowpage + 1;
+            }
+            console.log("page____go,page:"+page);
+            this.$emit('change', page);
+            return false;
+		}
 	}
 }
 </script>
@@ -59,14 +77,23 @@ export default {
   float:right;
   margin-right:20px;
   text-align:right;
-  
+  margin-top: 30px;
+  margin-bottom: 30px;
   span{
-    height:30px;
-    width:25px;
-    backgroud:#848484;
+    display: inline-block;
+    height: 30px;
+    width: 30px;
+    border: 1px solid #e6e6e6;
+    border-collapse: inherit;
+    text-align: center;
+    line-height: 31px;
+    cursor:pointer;
   }
-  span{
-    backgroud:#fff;
+  span:hover{
+    background: #dcdcdc;
+  }
+  span.now{
+    background: #dcdcdc;
   }
 }
 </style>

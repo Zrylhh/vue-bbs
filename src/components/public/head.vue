@@ -5,8 +5,8 @@
 			<input type="text"/> <button>搜索</button>
 		</div>
 		<div class="nav-bar">
-			<a href="javascript:void(0)">其他</a>
-			<a href="javascript:void(0)">其他</a>
+			<a href="https://cnodejs.org/">cnode社区</a>
+			<a href="/topics">首页</a>
 			<a href="javascript:void(0)">登录</a>
 		</div>
 	</header>
@@ -31,7 +31,7 @@ export default {
 
 <style lang="stylus">
 *{
-  transition: all .3s linear;
+  transition: all 1s easy-in 1s;
 }
 
 .head{
@@ -63,7 +63,7 @@ export default {
     }
     input{
   	  border: 1px solid #184631;
-  	  outline: 1px solid #41b883;
+  	  outline: 0;
       border-radius: 5px;
 	  height: 30px;
  	  background: transparent;
@@ -73,6 +73,7 @@ export default {
     input:focus{
       width:260px;
       border: 1px solid #41b883;
+  	  outline: 0;
     }
     button{
   	  height: 30px;

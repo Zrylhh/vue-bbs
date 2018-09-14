@@ -1,71 +1,117 @@
 <template>
 	<div class="container">
+		<div class="nav-bar" >
+			<span v-for='(tmpTab, index) in tabs'
+				@click.prevent.stop="changeTab(tmpTab.tab)" 
+				:class="{now:checkNowTab(tmpTab.tab)}">
+				{{tmpTab.name}}
+			</span>
+		</div>
 		<div class="themes-list">
 			<div v-if='getRequestStatus'>
-				<div v-for='(theme, index) in themeData' :key='index' :id="theme.id" class="theme">
-					<a :href="getLink(theme.id)">
-						<img src="../assets/example.png"/>
-						<div class="intro">
-			              <h4>{{theme.title}}</h4>
-			              <p><span>{{theme.author.loginname}}</span> | <span>{{theme.create_at}}</span></p>
-			            </div>
-					</a>
-				</div>
-				<!--<button class="loadMore" @click='loadMoreBtn' v-show='loadBtn'>点击加载更多</button>-->
+				<transition-group name="slide-fade" tag="div">
+					<div v-for='(theme, index) in themeData' :key='theme.id' :id="theme.id" class="theme">
+						<a :href="getLink(theme.id)">
+							<img src="../assets/example.png"/>
+							<div class="intro">
+				              <h4>{{theme.title}}</h4>
+				              <p><span>{{theme.author.loginname}}</span> | <span>{{theme.create_at}}</span></p>
+				              <span class="reply-num"><i class="fa" ></i>{{theme.reply_count}}</span>
+				            </div>
+						</a>
+					</div>
+				</transition-group>
 			</div>
 			<div class="fail" v-else>/(ㄒoㄒ)/~~， 请求到数据失败!</div>
+			<app-page :nowpage="page" @change="changePageMethod"></app-page>
 		</div>
-		<app-page></app-page>
+		
+		<trans-mask :isPlay="isLoading"></trans-mask>
 	</div>
 </template>
 
 <script>
 // 导入vuex
 import { mapState,mapGetters , mapMutations, mapActions } from 'vuex'
-import Page from './public/page.vue'
+import AppPage from './public/page.vue'
+import Mask from './public/mask.vue'
+
 export default {
 	data () {
 	    return {
-	      page:1
+	      page:1, // 当前页码
+	      tab:""
 	    }
   	},
   	computed: {
-	    /**
-	     * @desc 从store中引入需要的数据
-	     */
 	    ...mapState({
-	      page: state => state.ThemeListStore.page,
+	      getPage: state => state.ThemeListStore.page,
 	      newsUrl: state => state.ThemeListStore.newsUrl,
 	      themeData: state => state.ThemeListStore.themeData,
-	      page: state => state.ThemeListStore.page,
-	      tab: state => state.ThemeListStore.tab,
 	      limit: state => state.ThemeListStore.limit,
-	      mdrender: state => state.ThemeListStore.mdrender
+	      mdrender: state => state.ThemeListStore.mdrender,
+	      isLoading: state => state.ThemeListStore.isLoading,
+	      tabs: state => state.ThemeListStore.tabs
+	      
 	    }),
 	    ...mapGetters([
-	      'getRequestStatus'
+	      'getRequestStatus',
 	      // ...
 	    ])
 	  },
 	created: function () {
-		console.log("_________on created");
-		let params = "?page="+this.page;
-		params += "&tab="+this.tab;
-		params += "&limit="+this.limit;
-		params += "&mdrender="+this.mdrender;
-	    this.askNews(params) // 第一次加载请求数据
-	    let _this = this
+		console.log("themeList: _________on created");
+		
+		let params = {};
+		params.page = this.page;
+		params.tab = this.tab;
+	    this.askNews(params);
 	  },
+	updated:function(){
+		console.log("themlist updated");
+	},
+	beforeUpdate:function(){
+		console.log("themlist beforeUpdate");
+	},
 	methods: {
 		...mapActions([
-	      'askNews'
+	      'askNews',
+	      'changePage'
 	    ]),
 	    getLink:function(id){
-	    	return "/topic/"+id;
+	    	return "topic/"+id;
+	    },
+	    changePageMethod : function(nowpage){
+	    	this.page = nowpage;
+	    	console.log("themeList____changePageMethod,nowpage:"+nowpage);
+	    	//this.changePage(nowpage);
+	    },
+	    changeTab : function(tab){
+	    	this.tab = tab;
+	    },
+	    checkNowTab : function(tab){
+	    	return tab==this.tab;
 	    }
 	},
 	components: {
-		'app-page':Page
+		'app-page':AppPage,
+		'trans-mask':Mask
+	},
+	watch:{
+		tab:function(){
+			// 改变tab之后，页数归1
+			this.page = 1;
+			let params = {};
+			params.page = this.page;
+			params.tab = this.tab;
+		    this.askNews(params); 
+		},
+		page:function(){
+			let params = {};
+			params.page = this.page;
+			params.tab = this.tab;
+		    this.askNews(params); 
+		}
 	}
 }
 </script>
@@ -73,12 +119,35 @@ export default {
 <style lang="stylus">
 .container{
   background: #fff;
+  width: 82%;
+  margin: 0 auto;
   .swiper-wrapper{
     height: 200px;
     .swiper-slide img{
       width: 100%;
       height: 200px;
     }
+  }
+  .nav-bar{
+  	height:40px;
+  	background: #262627;
+  	color:#fff;
+  	border-left: 12px solid #41b883;
+  	text-align: left;
+  	padding-left: 10px;
+  	span{
+  	  width: 50px;
+      height: 100%;
+      display: inline-block;
+      line-height: 40px;
+      text-align: center;
+  	}
+  	span.now{
+  	  background:#505050;
+  	}
+  	span:hover{
+  	  background:#505050;
+  	}
   }
   .themes-list{
     min-height: 500px;
@@ -101,6 +170,17 @@ export default {
         	h4{
         		text-decoration: unset;
         	}
+            .reply-num{
+                i:before{
+                    color: #f76f0b;
+                    content: "\f0e5";
+                }
+            }
+            .reply-num:hover{
+                i:before{
+                    content: "\F075";
+                }
+            }
         }
     }
     .new{
@@ -222,4 +302,22 @@ export default {
     margin-bottom: 10px;
   }
 }
+
+
+.slide-fade-enter-active {
+  transition: all .5s linear .3s;
+}
+.slide-fade-leave-active {
+  transition: all .5s linear;
+}
+.slide-fade-leave-to
+{
+  transform: translateY(50px);
+  opacity: 0;
+}
+.slide-fade-enter{
+  transform: translateY(50px);
+  opacity: 0;
+}
+
 </style>

@@ -4,8 +4,7 @@
       <app-head></app-head>
       <!--<app-nav></app-nav>-->
       <!--keep-alive 切换路不会触发mounted-->
-      <!--暂时只有两个页面，帖子列表和帖子详情 -->
-      <keep-alive><router-view></router-view></keep-alive>
+      <keep-alive><transition name="fade" tag="div"><router-view></router-view></transition></keep-alive>
       <!--<app-foot></app-foot>-->
     </div>      
   </div>
@@ -30,6 +29,9 @@ export default {
 </script>
 
 <style>
+body{
+  margin: 0;
+}
 #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -42,10 +44,24 @@ export default {
   position: relative;
   z-index: 99;
   transition: all 0.5s;
-  width: 86%;
-  margin: 0 auto;
 }
 .toggle{
   transform: translateX(-120px);
+}
+
+.fade-enter-active {
+  transition: all .5s linear .3s;
+}
+.fade-leave-active {
+  transition: all .5s linear;
+}
+.fade-leave-to
+{
+  transform: translateX(30px);
+  opacity: 0;
+}
+.fade-enter{
+  transform: translateX(30px);
+  opacity: 0;
 }
 </style>
