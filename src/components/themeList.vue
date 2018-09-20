@@ -1,5 +1,5 @@
 <template>
-	<div class="container">
+	<div class="container-list">
 		<div class="nav-bar" >
 			<span v-for='(tmpTab, index) in tabs'
 				@click.prevent.stop="changeTab(tmpTab.tab)" 
@@ -9,24 +9,30 @@
 		</div>
 		<div class="themes-list">
 			<div v-if='getRequestStatus'>
-				<transition-group name="slide-fade" tag="div">
-					<div v-for='(theme, index) in themeData' :key='theme.id' :id="theme.id" class="theme">
-						<a :href="getLink(theme.id)">
-							<img src="../assets/example.png"/>
-							<div class="intro">
-				              <h4>{{theme.title}}</h4>
-				              <p><span>{{theme.author.loginname}}</span> | <span>{{theme.create_at}}</span></p>
-				              <span class="reply-num"><i class="fa" ></i>{{theme.reply_count}}</span>
-				            </div>
-						</a>
-					</div>
-				</transition-group>
+				<div v-if="themeData.length>0">
+					<transition-group name="fade" tag="div">
+						<div v-for='(theme, index) in themeData' :key='theme.id' :id="theme.id" class="theme">
+							<router-link :to="{name:'topic',params: { topicId: theme.id }}">
+								<img src="../assets/example.png"/>
+								<div class="intro">
+					              <h4>{{theme.title}}</h4>
+					              <p><span>{{theme.author.loginname}}</span> | <span>{{theme.create_at}}</span></p>
+					              <span class="reply-num"><i class="fa" ></i>{{theme.reply_count}}</span>
+					            </div>
+							</router-link>
+						</div>
+					</transition-group>
+				</div>
+				<div v-else>
+					no more data {{themeData.length}}
+				</div>
+			</div>
+			<div v-else>
+				request status false
 			</div>
 			<div class="fail" v-else>/(ㄒoㄒ)/~~， 请求到数据失败!</div>
-			<app-page :nowpage="page" @change="changePageMethod"></app-page>
+			<app-page :baseUrl="baseUrl" :nowpage=page ></app-page>
 		</div>
-		
-		<trans-mask :isPlay="isLoading"></trans-mask>
 	</div>
 </template>
 
@@ -34,13 +40,13 @@
 // 导入vuex
 import { mapState,mapGetters , mapMutations, mapActions } from 'vuex'
 import AppPage from './public/page.vue'
-import Mask from './public/mask.vue'
 
 export default {
 	data () {
 	    return {
 	      page:1, // 当前页码
-	      tab:""
+	      tab:"",
+	      baseUrl:"topics"
 	    }
   	},
   	computed: {
@@ -58,33 +64,15 @@ export default {
 	      'getRequestStatus',
 	      // ...
 	    ])
-	  },
-	created: function () {
-		console.log("themeList: _________on created");
-		
-		let params = {};
-		params.page = this.page;
-		params.tab = this.tab;
-	    this.askNews(params);
-	  },
-	updated:function(){
-		console.log("themlist updated");
-	},
-	beforeUpdate:function(){
-		console.log("themlist beforeUpdate");
 	},
 	methods: {
 		...mapActions([
 	      'askNews',
-	      'changePage'
+	      'changePage',
+	      'changeIsBack'
 	    ]),
 	    getLink:function(id){
 	    	return "topic/"+id;
-	    },
-	    changePageMethod : function(nowpage){
-	    	this.page = nowpage;
-	    	console.log("themeList____changePageMethod,nowpage:"+nowpage);
-	    	//this.changePage(nowpage);
 	    },
 	    changeTab : function(tab){
 	    	this.tab = tab;
@@ -93,11 +81,38 @@ export default {
 	    	return tab==this.tab;
 	    }
 	},
+	created: function () {
+	
+		console.log("themeList: _________on created");
+		this.$store.dispatch("changeIsBackAction",false);
+		let params = {};
+		params.page = this.page;
+		params.tab = this.tab;
+	    this.askNews(params);
+	    //this.$forceUpdate();
+	},
+	mounted: function () {
+		console.log("themeList: _________on mounted start");
+		console.log(this.themeData);
+		console.log("themeList: _________on mounted end");
+	},
+	updated:function(){
+		console.log("themlist updated");
+	},
+	beforeUpdate:function(){
+		console.log("themlist beforeUpdate");
+	},
 	components: {
-		'app-page':AppPage,
-		'trans-mask':Mask
+		'app-page':AppPage
 	},
 	watch:{
+        $route:function(){
+        	console.log("themeList____ route change");
+        	var tmpPage=this.$route.params.page;
+        	if(tmpPage&&!isNaN(tmpPage)&&parseInt(tmpPage)>0){
+        		this.page = parseInt(tmpPage);
+        	}
+        },
 		tab:function(){
 			// 改变tab之后，页数归1
 			this.page = 1;
@@ -117,10 +132,12 @@ export default {
 </script>
 
 <style lang="stylus">
-.container{
+.container-list{
   background: #fff;
   width: 82%;
   margin: 0 auto;
+  position: relative;
+  display: block;
   .swiper-wrapper{
     height: 200px;
     .swiper-slide img{
@@ -237,6 +254,50 @@ export default {
     }
   }
 }
+@media(max-width: 400px){
+  .container-list{
+    width: 100%;
+    .themes-list{
+      width: 100%;
+      border:0;
+      padding:0;
+      .theme{
+        height: 70px;
+        padding: 5px 10px;
+        font-size: 14px;
+        a{
+          border: none;
+          -webkit-tap-highlight-color: rgba(0,0,0,0);
+          -webkit-tap-highlight-color: transparent;
+          outline: none;
+          img{
+            height:100%;
+          }
+          .intro{
+            margin-top: 6px;
+            p{
+              margin:0;
+              font-size: 13px;
+            }
+            h4{
+              margin:0;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
+            }
+            .reply-num{
+              font-size: 13px;
+            }
+          }
+        }
+      }
+    }
+    .nav-bar{
+      border:0;
+      padding:0;
+    }    
+  }
+}
 /*加载动画*/
 .spinner {
   position: fixed;
@@ -317,6 +378,22 @@ export default {
 }
 .slide-fade-enter{
   transform: translateY(50px);
+  opacity: 0;
+}
+
+.fade-enter-active {
+  transition: all .5s linear .3s;
+}
+.fade-leave-active {
+  transition: all .5s linear;
+}
+.fade-leave-to
+{
+  transform: translateX(30px);
+  opacity: 0;
+}
+.fade-enter{
+  transform: translateX(30px);
   opacity: 0;
 }
 

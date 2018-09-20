@@ -36,7 +36,8 @@ export default {
 	    loadAnimation: true,
 	    requestStatus: true,
 	    baseUrl: 'https://cnodejs.org/api/v1/topics',
-	    isLoading:false
+	    isLoading:false,
+	    isBack:false
 	  },
 	getters: {
 	    getRequestStatus: state => {
@@ -51,10 +52,11 @@ export default {
 			let data = state.data;
 			if (data.length > 1) { // 判断数据是否存在
 //				state.themeData = [];
-		        for (var i = 0; i < data.length; i++) {
+//		        for (var i = 0; i < data.length; i++) {
 //		          state.themeData.push(data[i])
-		          state.themeData[i] = data[i];
-		        }
+//		          state.themeData[i] = data[i];
+		        state.themeData.splice(0,data.length,...data);
+//		        }
 		      } else {
 		        state.loadAnimation = false
 		        console.log('没有更多数据了')
@@ -62,13 +64,23 @@ export default {
 		      }
 			// 数据请求成功显示加载更多按钮
 			console.log("mutation：加载数据"+state.themeData.length+"条");
-		      state.loadBtn = true
-		      state.loadAnimation = false
+		    state.loadBtn = true
+		    state.loadAnimation = false
 		},
 		loadPage(state,nowpage){
 			console.log("store____mutation____changePage, nowpage:"+nowpage);
 			state.page = nowpage;
-		}
+		},
+		changeIsLoading(state,flag){
+			if(flag==true||flag==false){
+				state.isLoading = flag;
+			}
+		},
+		changeIsBack(state,flag){
+			if(flag==true||flag==false){
+				state.isBack = flag;
+			}
+		},
 	},
 	actions:{
 		askNews ({commit, state}, params) {
@@ -101,6 +113,7 @@ export default {
 		    	  commit('loadNews')
 		      })
 		},
+		
 		changePage ({commit,state}, nowpage){
 			console.log("store____action____changePage, nowpage:"+nowpage);
 			
@@ -128,5 +141,11 @@ export default {
 		    	  commit('loadPage',nowpage);
 		      })
 		},
+		changeIsLoading({commit,state},flag){
+			commit('changeIsLoading',flag);
+		},
+		changeIsBackAction({commit,state},flag){
+			commit('changeIsBack',flag);
+		}
 	}
 }

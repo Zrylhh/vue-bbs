@@ -1,15 +1,17 @@
 <template>
-	<div class="page-index">
-		<span @click.prevent.stop="go(1)">&lt;&lt;</span>
+	<div  class="page-index">
+		<router-link :to="'/'+baseUrl+'/'+'1'" tag="span">&lt;&lt;</router-link>
 		<span>···</span>
-		<span v-for='(page,index) in getRenderPages' 
-			:class="{ now: checkNowPage(page) }"
-			@click.prevent.stop="go(parseInt(page))"
-			>
-			{{page}}
-		</span>
+		<template v-for='(page,index) in getRenderPages'>
+			<router-link 
+				:to="'/'+baseUrl+'/'+page" 
+				tag="span" 
+				:class="{ now: checkNowPage(page) }">
+				{{page}}
+			</router-link>
+		</template>
 		<span>···</span>
-		<span @click.prevent.stop="go('next')">&gt;</span>
+		<router-link :to="'/'+baseUrl+'/'+(nowpage+1)" tag="span">&gt;</router-link>
 	</div>
 </template>
 
@@ -17,7 +19,7 @@
 <script>
 // 导入vuex
 import { mapState,mapGetters, mapMutations, mapActions } from 'vuex'
-
+import FastClick from 'fastclick'
 export default {
 	name:'app-page',
 	props :{
@@ -25,6 +27,9 @@ export default {
             type : Number,
             default : 1
         },
+        baseUrl: {
+        	type : String
+        }
 	},
 	data(){
 		return {
@@ -49,10 +54,26 @@ export default {
 			}
 			
 			return pageArr;
+		},
+		checkDevice :function(){
+			if(window.outerWidth>400){
+				return true;
+			}else{
+				return false;
+			}
 		}
 	},
 	created:function(){
 		console.log("page_____ nowpage:"+this.nowpage);
+	},
+	mounted:function(){
+		if(!this.checkDevice){
+			console.log("page_____ fit to mobile use fastclick");
+			console.log(document);
+			var pages = document.getElementsByClassName('page-index');
+			var pageIndex = pages[0];
+			FastClick.attach(pageIndex);
+		}
 	},
 	methods: {
 		checkNowPage : function(page){

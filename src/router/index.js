@@ -15,19 +15,31 @@ const router = new Router({
 	mode:'history',
 	routes:[
 	  {
+		  path:"/",
+		  redirect:'/topics/1'
+	  },{
 		  path:"/topics",
+		  redirect:'/topics/1'
+	  },{
+		  path:"/topics/:page",
 		  component: themeList,
+		  name:'topics',
 		  meta:{
 			  title:"首页"
 		  }
 	  },{
 		  path:"/topic/:topicId",
 		  component: themeDetail,
+		  name:'topic',
 		  meta:{
 			  title:"..."
 		  }
 	  }         
-	]
+	],
+	scrollBehavior (to, from, savedPosition) {
+		console.log("roll to top");
+		return { x: 0, y: 0 };
+	}
 })
 
 /**
