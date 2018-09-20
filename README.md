@@ -24,3 +24,8 @@ npm run unit
 # run all tests
 npm test
 ```
+
+## history
+### v1.0.0
+now fit to mobile phone.
+I will create a new branch and use Bootstrap to adjust the page.
