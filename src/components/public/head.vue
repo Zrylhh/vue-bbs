@@ -76,6 +76,15 @@ export default {
 	methods:{
 		changeSideMenu : function(){
 			this.isShowSideMenu = !this.isShowSideMenu;
+			var that = this;
+			if(this.isShowSideMenu==true){
+				function handle(){
+					console.log("head_________click");
+					that.isShowSideMenu = false;
+					document.removeEventListener("click",handle,false);
+				}
+				document.addEventListener("click",handle,false);
+			}
 		},
 		back : function(){
 			this.$router.go(-1);

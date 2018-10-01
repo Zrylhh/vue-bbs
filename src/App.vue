@@ -72,11 +72,11 @@ body{
 }
 .fade-leave-to
 {
-  transform: translateX(30px);
+/*  transform: translateX(30px);*/
   opacity: 0;
 }
 .fade-enter{
-  transform: translateX(30px);
+/*  transform: translateX(30px);*/
   opacity: 0;
 }
 </style>

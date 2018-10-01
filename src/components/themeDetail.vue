@@ -14,8 +14,9 @@
 			<div class="comment">
 				<div v-for="(reply,index) in themeObj.replies" :key="reply.id" class="reply">
 					<div class="avatar">
-						<img src="../assets/example.png"/>
-						<span class="username">{{reply.author.loginname}}</span>
+						<img src="../assets/avatar.png"/>
+						<span class="username" v-html="getUserNameHtml(reply.author.loginname)">
+						</span>
 					</div>
 					<div class="content">
 						<p v-html="reply.content"></p>
@@ -39,22 +40,43 @@ export default {
 	data(){
 		return {
 			themeObj:{
+				author:{
 				
+				}
 			},
 			baseUrl:'https://cnodejs.org/api/v1/topic',
 			mdrender :true
 		}
 	},
-	method:{
+	methods:{
 		...mapActions([
 	      'changeIsLoading',
 	      'changeIsBackAction'
-	    ])
+	    ]),
+	    getUserNameHtml : function(loginname){
+			console.log("themeDetail____username:"+loginname.toString());
+			if(typeof loginname == "object"){
+				return loginname;
+			}else{
+				var baseValue = (Math.random()*parseInt("ffffff",16)+0.5)>>0;
+		    	var bgColor = ("00000"+baseValue).toString(16).slice(-6); 
+		    	var textColor = "#"+("00000"+(parseInt("ffffff",16)-baseValue).toString(16)).slice(-6); 
+		    	
+		    	// 计算补色
+		    	var R = bgColor.slice(0,2);
+		    	var G = bgColor.slice(2,4);
+		    	var B = bgColor.slice(4,6);
+		    	var reverseR = (255-parseInt(R,16)).toString(16);
+		    	var reverseG = (255-parseInt(G,16)).toString(16);
+		    	var reverseB = (255-parseInt(B,16)).toString(16);
+		    	
+		    	return `<span style="background:${'#'+bgColor};color:${'#'+reverseR+reverseG+reverseB};" >${loginname.slice(0,1)}</span>${loginname.slice(1)}`;
+			}
+	    }
+	    
 	},
 	computed:{
-		getTopicId:function(){
-			return this.$route.params.topicId;
-		}
+		
 	},
 	created:function(){
 		console.log("进入主题详情页");
@@ -63,8 +85,9 @@ export default {
 		// 因为基本不需要更新数据，所以只在创建时请求一次数据
 		// 暂时不考虑发表评论后刷新评论的情况，也没有相关接口
 		var topicId = this.$route.params.topicId;
-		//this.changeIsBackAction(true);
-		this.$store.dispatch("changeIsBackAction",true);
+		if(window.outerWidth<400){
+			this.$store.dispatch("changeIsBackAction",true);
+		}
 		axios({
 			method: 'get',
 			url: this.baseUrl +'/'+ topicId +'?mdrender='+this.mdrender		
@@ -154,6 +177,16 @@ export default {
         border-bottom: 1px solid #dedede;
         padding: 15px 50px;
         display:block;
+        .avatar{
+          .username{
+            span{
+              width: 1em;
+              display: inline-block;
+              text-align: center;
+              border-radius: 4px;
+            }
+          }
+        }
         .markdown-text{
           text-align: left;
           p{
@@ -174,6 +207,7 @@ export default {
           }
           a{
             color: #000;
+            word-wrap: break-word;
           }
         }
         img{
@@ -234,26 +268,22 @@ export default {
       }
       .comment{
         .reply{
-          padding: 5px 15px;
+          padding: 5px 10px;
           min-height: 80px;
-          display:inline-block;
+          display:block;
           .avatar{
-            display: inline-block;
-            width: 20%;
+            display: block;
+            height: 40px;
+            padding: 5px 0px;
             img{
-              width:100%;
               height:100%;
             }
             .username{
-              display: block;
-              text-align: center;
-              word-wrap: break-word;              
+              display: inline-block;
+              vertical-align: top;
             }
           }
           .content{
-            float:right;
-            width:75%;
-            display: inline-block;
             p{
               padding:0 ;
               text-indent: 0;
