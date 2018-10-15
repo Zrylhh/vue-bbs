@@ -2,16 +2,14 @@
   <div id="app">
   	<div class="page">
       <app-head :isBack="isBack"></app-head>
-      <!--<app-nav></app-nav>-->
       <!--keep-alive 切换路不会触发mounted-->
       <keep-alive>
-	  	<transition name="fade" tag="div">
-	      <router-view></router-view>
-		</transition>
-	  </keep-alive>
+  	  	<transition name="fade" tag="div">
+  	      <router-view></router-view>
+  		  </transition>
+	    </keep-alive>
       <app-mask :isPlay="isLoading"></app-mask>
-      <!--<app-foot></app-foot>-->
-    </div>      
+    </div>
   </div>
 </template>
 
@@ -20,7 +18,7 @@ import { mapState,mapGetters , mapMutations, mapActions } from 'vuex'
 
 import HelloWorld from './components/HelloWorld.vue'
 import Spinner from './components/Spinner.vue'
-import Head from './components/public/head.vue'
+import appHead from './components/public/appHead.vue'
 import Mask from './components/public/mask.vue'
 export default {
 	name: 'App',
@@ -31,14 +29,14 @@ export default {
 		})
 	},
 	components: {
-	  'app-head':Head,
+	  'app-head':appHead,
 	  'app-mask':Mask
 	},
 	data(){
 		return {
 			is_paused:false
 		}
-	
+
 	}
 }
 </script>

@@ -5,6 +5,7 @@ import HelloWorld from '@/components/HelloWorld'
 import store from '@/store'
 import themeList from '@/components/themeList'
 import themeDetail from '@/components/themeDetail'
+import imgView from '@/components/public/imgView'
 
 Vue.use(Router)
 
@@ -34,7 +35,14 @@ const router = new Router({
 		  meta:{
 			  title:"..."
 		  }
-	  }         
+	  },{
+		  path:"/imgView/url=:src",
+		  component: imgView,
+		  name:'imgView',
+		  meta:{
+			  title:"查看图片"
+		  }
+	  }
 	],
 	scrollBehavior (to, from, savedPosition) {
 		console.log("roll to top");

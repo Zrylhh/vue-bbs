@@ -2,7 +2,7 @@
 	<div class="container-detail">
 		<div class="main">
 			<div class="theme-detail">
-				<div class="title" v-title :data-title="themeObj.title">
+				<div class="title" :data-title="themeObj.title">
 					<h3>{{themeObj.title}}</h3>
 				</div>
 				<div class="content">
@@ -10,7 +10,7 @@
 					</p>
 				</div>
 			</div>
-			
+
 			<div class="comment">
 				<div v-for="(reply,index) in themeObj.replies" :key="reply.id" class="reply">
 					<div class="avatar">
@@ -41,7 +41,7 @@ export default {
 		return {
 			themeObj:{
 				author:{
-				
+
 				}
 			},
 			baseUrl:'https://cnodejs.org/api/v1/topic',
@@ -54,29 +54,28 @@ export default {
 	      'changeIsBackAction'
 	    ]),
 	    getUserNameHtml : function(loginname){
-			console.log("themeDetail____username:"+loginname.toString());
-			if(typeof loginname == "object"){
-				return loginname;
-			}else{
-				var baseValue = (Math.random()*parseInt("ffffff",16)+0.5)>>0;
-		    	var bgColor = ("00000"+baseValue).toString(16).slice(-6); 
-		    	var textColor = "#"+("00000"+(parseInt("ffffff",16)-baseValue).toString(16)).slice(-6); 
-		    	
-		    	// 计算补色
-		    	var R = bgColor.slice(0,2);
-		    	var G = bgColor.slice(2,4);
-		    	var B = bgColor.slice(4,6);
-		    	var reverseR = (255-parseInt(R,16)).toString(16);
-		    	var reverseG = (255-parseInt(G,16)).toString(16);
-		    	var reverseB = (255-parseInt(B,16)).toString(16);
-		    	
-		    	return `<span style="background:${'#'+bgColor};color:${'#'+reverseR+reverseG+reverseB};" >${loginname.slice(0,1)}</span>${loginname.slice(1)}`;
-			}
+				if(typeof loginname == "object"){
+					return loginname;
+				}else{
+					var baseValue = (Math.random()*parseInt("ffffff",16)+0.5)>>0;
+			    	var bgColor = ("00000"+baseValue).toString(16).slice(-6);
+			    	var textColor = "#"+("00000"+(parseInt("ffffff",16)-baseValue).toString(16)).slice(-6);
+
+			    	// 计算补色
+			    	var R = bgColor.slice(0,2);
+			    	var G = bgColor.slice(2,4);
+			    	var B = bgColor.slice(4,6);
+			    	var reverseR = (255-parseInt(R,16)).toString(16);
+			    	var reverseG = (255-parseInt(G,16)).toString(16);
+			    	var reverseB = (255-parseInt(B,16)).toString(16);
+
+			    	return `<span style="background:${'#'+bgColor};color:${'#'+reverseR+reverseG+reverseB};" >${loginname.slice(0,1)}</span>${loginname.slice(1)}`;
+				}
 	    }
-	    
+
 	},
 	computed:{
-		
+
 	},
 	created:function(){
 		console.log("进入主题详情页");
@@ -84,22 +83,24 @@ export default {
 		//this.changeIsLoading(false);
 		// 因为基本不需要更新数据，所以只在创建时请求一次数据
 		// 暂时不考虑发表评论后刷新评论的情况，也没有相关接口
+		// 初始化图片
 		var topicId = this.$route.params.topicId;
 		if(window.outerWidth<400){
 			this.$store.dispatch("changeIsBackAction",true);
 		}
 		axios({
 			method: 'get',
-			url: this.baseUrl +'/'+ topicId +'?mdrender='+this.mdrender		
+			url: this.baseUrl +'/'+ topicId +'?mdrender='+this.mdrender
 		})
 		.then((res)=>{
 			// 请求完成后
 			if(res.status==200){
 		    	// 请求成功
 		    	this.themeObj = res.data.data;
+					document.title = this.themeObj.title;
 		    	//this.changeIsLoading(true);
 		    }else{
-		    	
+
 		    }
 		})
 	},
@@ -108,9 +109,11 @@ export default {
 	},
 	mounted: function(){
 		//this.changeIsBack(true);
+		// 挂载完毕后对文章及评论内容中的img进行处理，增加点击后跳转到imgView的事件
+		// 因为内容的html是直接从接口获取的，所以不能在create时就添加事件
 	},
 	beforeUpdate: function(){
-		// 
+		//
 	},
 	directives:{
 		// 自定义组件
@@ -152,8 +155,8 @@ export default {
             word-break: break-all;
           }
           img{
-            max-width: 100%;
-            float: left;
+            max-width: 90%;
+            display: block;
           }
           code{
             background: #f1f1f1;
@@ -223,13 +226,28 @@ export default {
         }
         .avatar{
           display: block;
+          height: 60px;
+          img{
+	          float: left;
+          }
+          .username{
+	          float: left;
+					  height: 60px;
+            display: block;
+            line-height: 60px;
+            span{
+	            height: 1.5em;
+	            line-height: 1.5em;
+            }
+          }
         }
         .content{
           display: block;
+					margin-left: 35px;
         }
       }
     }
-    
+
   }
   .user-info{
     width: 20%;
@@ -238,7 +256,7 @@ export default {
     background:#fff;
     margin-right: 5%;
     img{
-      height: 100px; 
+      height: 100px;
     }
   }
 }
@@ -263,7 +281,7 @@ export default {
               color: #000;
             }
           }
-          
+
         }
       }
       .comment{
@@ -281,6 +299,10 @@ export default {
             .username{
               display: inline-block;
               vertical-align: top;
+              span{
+                height:1em;
+                line-height:1em;
+              }
             }
           }
           .content{
@@ -301,9 +323,3 @@ export default {
   }
 }
 </style>
-
-
-
-
-
-
